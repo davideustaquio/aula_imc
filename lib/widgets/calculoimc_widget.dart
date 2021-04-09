@@ -11,9 +11,11 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController alturacontroller = TextEditingController();
   TextEditingController pesocontroller = TextEditingController();
-  TextEditingController generocontroller = TextEditingController();
+  TextEditingController quadrilcontroller = TextEditingController();
 
+  int _value = 0; //para check
   String _resultadoimc;
+  String _resultadoiac;
 
   void _calcularimc() {
     double altura = double.parse(alturacontroller.text) / 100.0;
@@ -21,42 +23,82 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
     double imc = peso / pow(altura, 2);
 
     setState(() {
-      _resultadoimc = imc.toStringAsFixed(2) + "\n\n" + getClassificacao(imc);
+      _resultadoimc = imc.toStringAsFixed(2) +
+          " ________ " +
+          getClassificacaoIMC(imc) +
+          "\n";
     });
   }
 
-  String getClassificacao(num imc) {
-    String strclassificao;
-    switch (generocontroller.text) {
-      case "M":
-        if (imc < 20.7)
-          strclassificao = "Abaixo do peso";
-        else if (imc < 26.4)
-          strclassificao = "Peso ideal";
-        else if (imc < 27.8)
-          strclassificao = "Pouco acima do peso";
-        else if (imc < 31.1)
-          strclassificao = "Acima do peso";
+  void _calculariac() {
+    double altura = double.parse(alturacontroller.text) / 100.0;
+    double quadril = double.parse(quadrilcontroller.text);
+    double iac = (quadril / altura * sqrt(altura)) - 18;
+
+    setState(() {
+      _resultadoiac = iac.toStringAsFixed(2) +
+          " ________ " +
+          getClassificacaoIAC(iac) +
+          "\n";
+    });
+  }
+
+  String getClassificacaoIAC(num iac) {
+    String strclassificaoIAC;
+    switch (_value) {
+      case 0: //masculino
+        if (iac < 20)
+          strclassificaoIAC = "Normal";
+        else if (iac < 25)
+          strclassificaoIAC = "Sobrepeso";
         else
-          strclassificao = "Obesidade";
+          strclassificaoIAC = "Obesidade";
+        break;
+
+      case 1: //feminino
+        if (iac < 32)
+          strclassificaoIAC = "Normal";
+        else if (iac < 38)
+          strclassificaoIAC = "Sobrepeso";
+        else
+          strclassificaoIAC = "Obesidade";
+        break;
+    }
+    return strclassificaoIAC;
+  }
+
+  String getClassificacaoIMC(num imc) {
+    String strclassificaoIMC;
+    switch (_value) {
+      case 0: //masculino
+        if (imc < 20.7)
+          strclassificaoIMC = "Abaixo do peso";
+        else if (imc < 26.4)
+          strclassificaoIMC = "Peso ideal";
+        else if (imc < 27.8)
+          strclassificaoIMC = "Pouco acima do peso";
+        else if (imc < 31.1)
+          strclassificaoIMC = "Acima do peso";
+        else
+          strclassificaoIMC = "Obesidade";
         //return strclassificao;
         break;
 
-      case "F":
+      case 1: //feminino
         if (imc < 19.1)
-          strclassificao = "Abaixo do peso";
+          strclassificaoIMC = "Abaixo do peso";
         else if (imc < 25.8)
-          strclassificao = "Peso ideal";
+          strclassificaoIMC = "Peso ideal";
         else if (imc < 27.3)
-          strclassificao = "Pouco acima do peso";
+          strclassificaoIMC = "Pouco acima do peso";
         else if (imc < 32.3)
-          strclassificao = "Acima do peso";
+          strclassificaoIMC = "Acima do peso";
         else
-          strclassificao = "Obesidade";
-        return strclassificao;
+          strclassificaoIMC = "Obesidade";
+        return strclassificaoIMC;
         break;
     }
-    return strclassificao;
+    return strclassificaoIMC;
   }
 
   @override
@@ -76,7 +118,7 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
                 controller: alturacontroller,
                 validator: (value) {
                   //validador
-                  return value.isEmpty ? "Informe a altura" : null;
+                  return value.isEmpty ? "Informe a altura em cm" : null;
                 },
                 decoration: InputDecoration(
                   labelText: "Altura em cm: ",
@@ -85,23 +127,66 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
             ),
             Container(
               margin: EdgeInsets.all(16),
-              //peso
               child: TextFormField(
+                //peso
                 keyboardType: TextInputType.number,
                 controller: pesocontroller,
                 validator: (value) {
                   //validador
-                  return value.isEmpty ? "Informe a altura" : null;
+                  return value.isEmpty ? "Informe o peso em Kg" : null;
                 },
                 decoration: InputDecoration(
                   labelText: "Peso em Kg: ",
                 ),
               ),
             ),
+
+            Container(
+              margin: EdgeInsets.all(16),
+              child: TextFormField(
+                //quadril
+                keyboardType: TextInputType.number,
+                controller: quadrilcontroller,
+                validator: (value) {
+                  //validador
+                  return value.isEmpty ? "Informe o peso em Kg" : null;
+                },
+                decoration: InputDecoration(
+                  labelText: "Circunferência do quadril em cm:",
+                ),
+              ),
+            ),
+
+            //botões de genero
             Container(
               margin: EdgeInsets.all(16),
               //genero
-              child: TextFormField(
+              child: Wrap(
+                children: [
+                  //icones de escolha check
+                  ChoiceChip(
+                    label: Text("Masculino"),
+                    selected: _value == 0,
+                    onSelected: (value) {
+                      setState(() {
+                        _value = value ? 0 : -1;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  ChoiceChip(
+                    label: Text("Feminino"),
+                    selected: _value == 1,
+                    onSelected: (value) {
+                      setState(() {
+                        _value = value ? 1 : -1;
+                      });
+                    },
+                  ),
+                ],
+              ),
+
+              /*child: TextFormField(
                 keyboardType: TextInputType.text,
                 controller: generocontroller,
                 validator: (value) {
@@ -111,23 +196,35 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
                 decoration: InputDecoration(
                   labelText: "Digite M ou F",
                 ),
-              ),
+              ), */
             ),
+
+            // resultados Text
             Container(
               margin: EdgeInsets.all(16),
-              child: Text(
-                _resultadoimc == null ? "" : "IMC: $_resultadoimc",
-              ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _resultadoimc == null ? "" : "IMC: $_resultadoimc",
+                    ),
+                    Text(
+                      _resultadoiac == null ? "" : "IAC: $_resultadoiac",
+                    )
+                  ]),
             ),
+
+            //botão calcular
             Container(
               margin: EdgeInsets.all(16),
               child: ElevatedButton(
                 onPressed: () {
                   if (_formkey.currentState.validate()) {
                     _calcularimc();
+                    _calculariac();
                   }
                 },
-                child: Text("Calcular"),
+                child: Text("OBTER RESULTADOS"),
               ),
             ),
           ],
