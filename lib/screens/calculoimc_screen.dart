@@ -1,3 +1,4 @@
+import 'package:aula_imc/widgets/calculoimc_widget.dart';
 import 'package:flutter/material.dart';
 
 class CalculoImcScreen extends StatelessWidget {
@@ -7,6 +8,7 @@ class CalculoImcScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Calculo IMC"),
       ),
+      body: CalculoImcWidget(),
     );
   }
 }
