@@ -11,6 +11,7 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController alturacontroller = TextEditingController();
   TextEditingController pesocontroller = TextEditingController();
+  TextEditingController generocontroller = TextEditingController();
 
   String _resultadoimc;
 
@@ -26,18 +27,35 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
 
   String getClassificacao(num imc) {
     String strclassificao;
-    if (imc < 18.6)
-      strclassificao = "Abaixo do peso";
-    else if (imc < 25.0)
-      strclassificao = "Peso ideal";
-    else if (imc < 30.0)
-      strclassificao = "Levemente acima do peso";
-    else if (imc < 35.0)
-      strclassificao = "Obesidade grau 1";
-    else if (imc < 40.0)
-      strclassificao = "Obesidade grau 2";
-    else
-      strclassificao = "Obesidade grau 3";
+    switch (generocontroller.text) {
+      case "M":
+        if (imc < 20.7)
+          strclassificao = "Abaixo do peso";
+        else if (imc < 26.4)
+          strclassificao = "Peso ideal";
+        else if (imc < 27.8)
+          strclassificao = "Pouco acima do peso";
+        else if (imc < 31.1)
+          strclassificao = "Acima do peso";
+        else
+          strclassificao = "Obesidade";
+        //return strclassificao;
+        break;
+
+      case "F":
+        if (imc < 19.1)
+          strclassificao = "Abaixo do peso";
+        else if (imc < 25.8)
+          strclassificao = "Peso ideal";
+        else if (imc < 27.3)
+          strclassificao = "Pouco acima do peso";
+        else if (imc < 32.3)
+          strclassificao = "Acima do peso";
+        else
+          strclassificao = "Obesidade";
+        return strclassificao;
+        break;
+    }
     return strclassificao;
   }
 
@@ -77,6 +95,21 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
                 },
                 decoration: InputDecoration(
                   labelText: "Peso em Kg: ",
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.all(16),
+              //genero
+              child: TextFormField(
+                keyboardType: TextInputType.text,
+                controller: generocontroller,
+                validator: (value) {
+                  //validador
+                  return value.isEmpty ? "M / F" : null;
+                },
+                decoration: InputDecoration(
+                  labelText: "Digite M ou F",
                 ),
               ),
             ),
