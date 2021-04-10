@@ -2,64 +2,55 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class CalculoImcWidget extends StatefulWidget {
+class CalculoIacWidget extends StatefulWidget {
   @override
-  _CalculoImcWidget createState() => _CalculoImcWidget();
+  _CalculoIacWidget createState() => _CalculoIacWidget();
 }
 
-class _CalculoImcWidget extends State<CalculoImcWidget> {
+class _CalculoIacWidget extends State<CalculoIacWidget> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController alturacontroller = TextEditingController();
   TextEditingController pesocontroller = TextEditingController();
+  TextEditingController quadrilcontroller = TextEditingController();
 
   int _value = 0; //para check
-  String _resultadoimc;
+  String _resultadoiac;
 
-  void _calcularimc() {
+  void _calculariac() {
     double altura = double.parse(alturacontroller.text) / 100.0;
-    double peso = double.parse(pesocontroller.text);
-    double imc = peso / pow(altura, 2);
+    double quadril = double.parse(quadrilcontroller.text);
+    double iac = (quadril / (altura * sqrt(altura))) - 18;
 
     setState(() {
-      _resultadoimc = imc.toStringAsFixed(2) +
+      _resultadoiac = iac.toStringAsFixed(2) +
           " ________ " +
-          getClassificacaoIMC(imc) +
+          getClassificacaoIAC(iac) +
           "\n";
     });
   }
 
-  String getClassificacaoIMC(num imc) {
-    String strclassificaoIMC;
+  String getClassificacaoIAC(num iac) {
+    String strclassificaoIAC;
     switch (_value) {
       case 0: //masculino
-        if (imc < 20.7)
-          strclassificaoIMC = "Abaixo do peso";
-        else if (imc < 26.4)
-          strclassificaoIMC = "Peso ideal";
-        else if (imc < 27.8)
-          strclassificaoIMC = "Pouco acima do peso";
-        else if (imc < 31.1)
-          strclassificaoIMC = "Acima do peso";
+        if (iac < 20)
+          strclassificaoIAC = "Normal";
+        else if (iac < 25)
+          strclassificaoIAC = "Sobrepeso";
         else
-          strclassificaoIMC = "Obesidade";
-        //return strclassificao;
+          strclassificaoIAC = "Obesidade";
         break;
 
       case 1: //feminino
-        if (imc < 19.1)
-          strclassificaoIMC = "Abaixo do peso";
-        else if (imc < 25.8)
-          strclassificaoIMC = "Peso ideal";
-        else if (imc < 27.3)
-          strclassificaoIMC = "Pouco acima do peso";
-        else if (imc < 32.3)
-          strclassificaoIMC = "Acima do peso";
+        if (iac < 32)
+          strclassificaoIAC = "Normal";
+        else if (iac < 38)
+          strclassificaoIAC = "Sobrepeso";
         else
-          strclassificaoIMC = "Obesidade";
-        return strclassificaoIMC;
+          strclassificaoIAC = "Obesidade";
         break;
     }
-    return strclassificaoIMC;
+    return strclassificaoIAC;
   }
 
   @override
@@ -103,6 +94,22 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
               ),
             ),
 
+            Container(
+              margin: EdgeInsets.all(16),
+              child: TextFormField(
+                //quadril
+                keyboardType: TextInputType.number,
+                controller: quadrilcontroller,
+                validator: (value) {
+                  //validador
+                  return value.isEmpty ? "Informe medida em centímetros" : null;
+                },
+                decoration: InputDecoration(
+                  labelText: "Circunferência do quadril em cm:",
+                ),
+              ),
+            ),
+
             //botões de genero
             Container(
               margin: EdgeInsets.all(16),
@@ -140,8 +147,8 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _resultadoimc == null ? "" : "IMC: $_resultadoimc",
-                    ),
+                      _resultadoiac == null ? "" : "IAC: $_resultadoiac",
+                    )
                   ]),
             ),
 
@@ -151,7 +158,7 @@ class _CalculoImcWidget extends State<CalculoImcWidget> {
               child: ElevatedButton(
                 onPressed: () {
                   if (_formkey.currentState.validate()) {
-                    _calcularimc();
+                    _calculariac();
                   }
                 },
                 child: Text("OBTER RESULTADOS"),
